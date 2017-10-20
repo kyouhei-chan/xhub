@@ -364,8 +364,31 @@
           </div>
         </div>
       </div>
-
     </div>
+
+    <!-- CUI Respons -->
+    <div style="display: none;">
+      {{ range $i, $e := .nodes }}
+        {{ $node_stopped := eq $e.Status 0 }}
+        {{ $node_warning := eq $e.Status 8 }}
+        {{ $node_danger := eq $e.Status 9 }}
+        {{ $node_ip := $e.IP }}
+        {{ $service_num := len .ServiceServers}}
+        {{ if eq $service_num 0 }}
+          ---- NodeCheck ----
+          no service {{ $node_ip }}
+        {{ end }}
+        {{ range .ServiceServers }}
+          ---- NodeCheck ----
+          node-name      : {{ .Name }}
+          node-ip        : {{ $node_ip }}
+          node-port      : {{ .Port }}
+          node-status    : {{ if or $node_stopped $node_danger }}Node Dead {{ else if eq .Status 0 }}Stopped {{ else if eq .Status 1 }}Active {{ else if eq .Status 2 }}Synchronizing {{ else if eq .Status 8 }}Warning {{ else if eq .Status 9 }}Danger {{ else }}Unknown {{ end }}
+          node-module    : {{ .Module }}
+        {{ end }}
+      {{ end }}
+    </div>
+
   </body>
 </html>
 
